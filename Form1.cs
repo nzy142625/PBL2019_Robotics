@@ -144,9 +144,6 @@ namespace PBL2019_Robotics
                 // 对象为null停止timer
                 timer1.Stop();
             }
-
         }
-
     }
 }
-
