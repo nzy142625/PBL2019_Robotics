@@ -22,10 +22,10 @@ namespace PBL2019_Robotics
         BeautoRoverlib br = new BeautoRoverlib();
         public Form1()
         {
-            // 初期化
-            // 初始化
+            // コンポーネント初期化
+            // 组件初始化
             InitializeComponent();
-            // カメラ映像を取得する
+            // カメラ映像を取得
             // 获取摄像头影像
             capture = VideoCapture.FromCamera(0);
             // カメラデバイスが正常にオープンしたか確認
@@ -33,7 +33,7 @@ namespace PBL2019_Robotics
             //textBox1.Text = Convert.ToString(capture.IsOpened());
         }
 
-        // スタートバートンを押す
+        // スタートバートンを押す処理
         // Start按钮按下事件
         private void ButtonStart_Click(object sender, EventArgs e)
         {
@@ -49,15 +49,15 @@ namespace PBL2019_Robotics
             // シリアルポートを開く
             // 打开串口
             //textBox1.Text = br.OpenCOMPort("COM4");
-            // スタートバートンを無効にする
+            // スタートバートン無効化
             // Start按钮无效化
             buttonStart.Enabled = false;
-            // ストーブバートンを有効にする
+            // ストーブバートン有効化
             // Stop按钮有效化
             buttonStop.Enabled = true;
         }
 
-        // ストーブバートンを押す
+        // ストーブバートンを押す処理
         // Stop按钮按下事件
         private void ButtonStop_Click(object sender, EventArgs e)
         {
@@ -67,10 +67,10 @@ namespace PBL2019_Robotics
             // シリアルポートを閉じる
             // 关闭串口
             //textBox1.Text = br.Close();
-            // スタートバートンを有効にする
+            // スタートバートン有効化
             // Start按钮有效化
             buttonStart.Enabled = true;
-            // ストーブバートンを無効にする
+            // ストーブバートン無効化
             // Stop按钮无效化
             buttonStop.Enabled = false;
         }
@@ -79,64 +79,70 @@ namespace PBL2019_Robotics
         // timer处理
         private void Timer1_Tick(object sender, EventArgs e)
         {
-            // 映像をBGR空間からHSV空間に変更し，Matオブジェクトを作る
-            // 创建Mat对象，将摄像头影像从BGR空间转换到HSV空间
-            Mat img = capture.RetrieveMat().CvtColor(ColorConversionCodes.BGR2HSV);
-            // オブジェクトがnullかどうかを判断
-            // 对象null判断
-            if (img != null)
+            // 元画像と処理画像のオブジェクトを作る
+            // 创建原图像及处理图像对象
+            Mat srcImg, procImg;
+            // 取得した映像をMatオブジェクトに転換
+            // 捕获帧转换为Mat对象
+            srcImg = capture.RetrieveMat();
+            // 処理オブジェクトにコピー
+            // 复制帧
+            procImg = srcImg.Clone();
+
+            // オブジェクトがnullでない場合
+            // 对象不为null时
+            if (procImg != null)
             {
-                // 映像を表示する
-                // 显示摄像头影像
-                pictureBox1.Image = img.ToBitmap();
-                // メモリクリア
+                // メモリ解放
                 // 清理内存
-                /*if (GC.GetTotalMemory(false) > 600000)
+                if (GC.GetTotalMemory(false) > 600000)
                 {
                     GC.Collect();
-                }*/
-                int sumPixelY = 0, sumPixelX = 0, count = 0;
-                int minX = 320, minY = 240, maxX = 0, maxY = 0;
-                for (int y = 0; y < img.Height; y++)
-                    for (int x = 0; x < img.Width; x++)
-                    {
-                        byte h = img.At<Vec3b>(y, x)[0];
-                        byte s = img.At<Vec3b>(y, x)[1];
-                        byte v = img.At<Vec3b>(y, x)[2];
+                }
 
-                        //if (r > 80 && b < 80 && g < 80)
-                        if ((h < 180 && h > 160) && (s > 80) && (v < 220 && v > 50))
-                        {
-                            img.Set<Vec3b>(y, x, new Vec3b(255, 255, 255));
-                            sumPixelY += y;
-                            sumPixelX += x;
-                            if (x < minX)
-                                minX = x;
-                            if (y < minY)
-                                minY = y;
-                            if (x > maxX)
-                                maxX = x;
-                            if (y > maxY)
-                                maxY = y;
-                            count++;
-                        }
-                        else
-                        {
-                            img.Set<Vec3b>(y, x, new Vec3b(0, 0, 0));
-                        }
-                        //textBox2.Text = Convert.ToString(capture.Get(CaptureProperty.Fps));
-                    }
-                Point center = new Point(sumPixelX / count, sumPixelY / count);
-                int r = ((maxX - minX) + (maxY - minY)) / 4;
-                img.Circle(center, r, Scalar.Green, 3);
+                // 映像をBGR空間からHSV空間に変更
+                // 将影像从BGR空间转换到HSV空间
+                procImg = procImg.CvtColor(ColorConversionCodes.BGR2HSV);
+                // グレースケール化
+                // 灰度处理
+                procImg = procImg.CvtColor(ColorConversionCodes.BGR2GRAY);
+                // メディアンフィルタリング
+                // 中值滤波
+                procImg = procImg.MedianBlur(15);
+                // 二値化
+                // 二值化
+                procImg = procImg.Threshold(140, 255, ThresholdTypes.Binary);
+                // モルフォロジー変換要素を作る
+                // 创建形态学结构元素
+                Mat element = Cv2.GetStructuringElement(MorphShapes.Ellipse, new OpenCvSharp.Size(15, 15));
+                // ノイズ除去するためオープニング処理
+                // 开运算去除噪点
+                procImg = procImg.MorphologyEx(MorphTypes.Open, element);
+                // 二値化映像を表示
+                // 显示二值化图像
+                pictureBox1.Image = procImg.ToBitmap();
 
-                textBox1.Text = Convert.ToString(img.At<Vec3b>(img.Height / 2, img.Width / 2)[0]);
-                textBox2.Text = Convert.ToString(img.At<Vec3b>(img.Height / 2, img.Width / 2)[1]);
-                textBox3.Text = Convert.ToString(img.At<Vec3b>(img.Height / 2, img.Width / 2)[2]);
+                // 輪郭オブジェクトを作る
+                // 创建轮廓对象
+                MatOfPoint[] contours;
+                // 輪郭検出
+                // 轮廓检测
+                contours = procImg.FindContoursAsMat(RetrievalModes.External, ContourApproximationModes.ApproxTC89L1);
+                // 輪郭存在する場合
+                // 如果存在轮廓
+                if (0 < contours.GetLength(0))
+                {
+                    // 輪郭により外接円の円心と半径を求める
+                    // 求外接圆圆心及半径
+                    contours[0].MinEnclosingCircle(out Point2f center, out float radius);
+                    // 元画像に外接円を描画
+                    // 在原图像上绘制外接圆
+                    srcImg.Circle((Point)center, (int)radius, Scalar.Green);
+                }
 
-                // 処理した画像を表示
-                // 显示处理后影像
-                pictureBox2.Image = img.ToBitmap();
+                // 元画像を表示
+                // 显示原图像
+                pictureBox2.Image = srcImg.ToBitmap();
             }
             else
             {
