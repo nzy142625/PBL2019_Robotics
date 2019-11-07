@@ -27,7 +27,7 @@ namespace PBL2019_Robotics
             InitializeComponent();
             // カメラ映像を取得
             // 获取摄像头影像
-            capture = VideoCapture.FromCamera(0);
+            capture = VideoCapture.FromCamera(1);
             // カメラデバイスが正常にオープンしたか確認
             // 确认是否正常获取摄像头
             //textBox1.Text = Convert.ToString(capture.IsOpened());
@@ -55,6 +55,9 @@ namespace PBL2019_Robotics
             // ストーブバートン有効化
             // Stop按钮有效化
             buttonStop.Enabled = true;
+
+            //connect BeautoRover
+            br.OpenCOMPort("COM6");
         }
 
         // ストーブバートンを押す処理
@@ -64,6 +67,9 @@ namespace PBL2019_Robotics
             // タイマー処理停止
             // timer停止
             timer1.Stop();
+            //Close BeautoRoner
+            br.Close();
+
             // シリアルポートを閉じる
             // 关闭串口
             //textBox1.Text = br.Close();
@@ -135,9 +141,34 @@ namespace PBL2019_Robotics
                     // 輪郭により外接円の円心と半径を求める
                     // 求外接圆圆心及半径
                     contours[0].MinEnclosingCircle(out Point2f center, out float radius);
+                    //indicate center & radius
+                    textBox1.Text = center.ToString();
+                    textBox2.Text = radius.ToString();
                     // 元画像に外接円を描画
                     // 在原图像上绘制外接圆
                     srcImg.Circle((Point)center, (int)radius, Scalar.Green);
+
+                    Point2f mc = center;
+
+                    if (center.X < 50)
+                    {
+                        br.TurnLeft();
+                    }
+                    else if (center.X > 270)
+                    {
+                        br.TurnRight();
+                    }
+                    else if (radius < 25)
+                    {
+                        br.Back();
+                    }
+                    else
+                    {
+                        br.Forward();
+                    }
+                }
+                else {
+                    br.Stop();
                 }
 
                 // 元画像を表示
@@ -150,6 +181,16 @@ namespace PBL2019_Robotics
                 // 对象为null停止timer
                 timer1.Stop();
             }
+        }
+
+        private void pictureBox2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            
         }
     }
 }
