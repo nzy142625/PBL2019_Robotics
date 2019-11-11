@@ -27,7 +27,7 @@ namespace PBL2019_Robotics
             InitializeComponent();
             // カメラ映像を取得
             // 获取摄像头影像
-            capture = VideoCapture.FromCamera(1);
+            capture = VideoCapture.FromCamera(0);
             // カメラデバイスが正常にオープンしたか確認
             // 确认是否正常获取摄像头
             //textBox1.Text = Convert.ToString(capture.IsOpened());
@@ -48,16 +48,13 @@ namespace PBL2019_Robotics
             timer1.Start();
             // シリアルポートを開く
             // 打开串口
-            //textBox1.Text = br.OpenCOMPort("COM4");
+            textBox1.Text = br.OpenCOMPort("COM6");
             // スタートバートン無効化
             // Start按钮无效化
             buttonStart.Enabled = false;
             // ストーブバートン有効化
             // Stop按钮有效化
             buttonStop.Enabled = true;
-
-            //connect BeautoRover
-            br.OpenCOMPort("COM6");
         }
 
         // ストーブバートンを押す処理
@@ -67,12 +64,10 @@ namespace PBL2019_Robotics
             // タイマー処理停止
             // timer停止
             timer1.Stop();
-            //Close BeautoRoner
-            br.Close();
 
             // シリアルポートを閉じる
             // 关闭串口
-            //textBox1.Text = br.Close();
+            textBox1.Text = br.Close();
             // スタートバートン有効化
             // Start按钮有效化
             buttonStart.Enabled = true;
@@ -142,29 +137,30 @@ namespace PBL2019_Robotics
                     // 求外接圆圆心及半径
                     contours[0].MinEnclosingCircle(out Point2f center, out float radius);
                     //indicate center & radius
-                    textBox1.Text = center.ToString();
-                    textBox2.Text = radius.ToString();
+                    textBox2.Text = center.ToString();
+                    textBox3.Text = radius.ToString();
                     // 元画像に外接円を描画
                     // 在原图像上绘制外接圆
                     srcImg.Circle((Point)center, (int)radius, Scalar.Green);
 
                     Point2f mc = center;
 
+                    //controll BeautoRover
                     if (center.X < 50)
                     {
-                        br.TurnLeft();
+                        textBox1.Text = br.TurnLeft();
                     }
                     else if (center.X > 270)
                     {
-                        br.TurnRight();
+                        textBox1.Text = br.TurnRight();
                     }
                     else if (radius < 25)
                     {
-                        br.Back();
+                        textBox1.Text = br.Back();
                     }
                     else
                     {
-                        br.Forward();
+                        textBox1.Text = br.Forward();
                     }
                 }
                 else {
@@ -182,15 +178,6 @@ namespace PBL2019_Robotics
                 timer1.Stop();
             }
         }
-
-        private void pictureBox2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-            
-        }
+        
     }
 }
