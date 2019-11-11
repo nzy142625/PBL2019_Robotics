@@ -148,11 +148,11 @@ namespace PBL2019_Robotics
                     //controll BeautoRover
                     if (center.X < 50)
                     {
-                        textBox1.Text = br.TurnLeft();
+                        textBox1.Text = br.TurnRight();
                     }
                     else if (center.X > 270)
                     {
-                        textBox1.Text = br.TurnRight();
+                        textBox1.Text = br.TurnLeft();
                     }
                     else if (radius < 25)
                     {
