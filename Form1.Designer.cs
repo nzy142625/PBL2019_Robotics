@@ -49,7 +49,7 @@
             // 
             this.textBox1.Location = new System.Drawing.Point(338, 258);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(100, 21);
+            this.textBox1.Size = new System.Drawing.Size(100, 19);
             this.textBox1.TabIndex = 0;
             // 
             // pictureBox1
@@ -97,14 +97,14 @@
             // 
             this.textBox2.Location = new System.Drawing.Point(444, 258);
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(100, 21);
+            this.textBox2.Size = new System.Drawing.Size(100, 19);
             this.textBox2.TabIndex = 4;
             // 
             // textBox3
             // 
             this.textBox3.Location = new System.Drawing.Point(550, 258);
             this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(100, 21);
+            this.textBox3.Size = new System.Drawing.Size(100, 19);
             this.textBox3.TabIndex = 4;
             // 
             // Form1
