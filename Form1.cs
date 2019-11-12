@@ -154,7 +154,7 @@ namespace PBL2019_Robotics
                     {
                         textBox1.Text = br.TurnLeft();
                     }
-                    else if (radius < 25)
+                    else if (radius > 50)
                     {
                         textBox1.Text = br.Back();
                     }
