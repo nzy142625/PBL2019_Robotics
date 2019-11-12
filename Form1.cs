@@ -79,19 +79,16 @@ namespace PBL2019_Robotics
         // timer处理
         private void Timer1_Tick(object sender, EventArgs e)
         {
-            // 元画像と処理画像のオブジェクトを作る
-            // 创建原图像及处理图像对象
-            Mat srcImg, procImg;
+            // 画像のオブジェクトを作る
+            // 创建图像对象
+            Mat srcImg;
             // 取得した映像をMatオブジェクトに転換
             // 捕获帧转换为Mat对象
             srcImg = capture.RetrieveMat();
-            // 処理オブジェクトにコピー
-            // 复制帧
-            procImg = srcImg.Clone();
-
+            
             // オブジェクトがnullでない場合
             // 对象不为null时
-            if (procImg != null)
+            if (srcImg != null)
             {
                 // メモリ解放
                 // 清理内存
@@ -100,49 +97,7 @@ namespace PBL2019_Robotics
                     GC.Collect();
                 }
 
-                // 映像をBGR空間からHSV空間に変更
-                // 将影像从BGR空间转换到HSV空间
-                procImg = procImg.CvtColor(ColorConversionCodes.BGR2HSV);
-                // グレースケール化
-                // 灰度处理
-                procImg = procImg.CvtColor(ColorConversionCodes.BGR2GRAY);
-                // メディアンフィルタリング
-                // 中值滤波
-                procImg = procImg.MedianBlur(15);
-                // 二値化
-                // 二值化
-                procImg = procImg.Threshold(140, 255, ThresholdTypes.Binary);
-                // モルフォロジー変換要素を作る
-                // 创建形态学结构元素
-                Mat element = Cv2.GetStructuringElement(MorphShapes.Ellipse, new OpenCvSharp.Size(15, 15));
-                // ノイズ除去するためオープニング処理
-                // 开运算去除噪点
-                procImg = procImg.MorphologyEx(MorphTypes.Open, element);
-                // 二値化映像を表示
-                // 显示二值化图像
-                pictureBox1.Image = procImg.ToBitmap();
-
-                // 輪郭オブジェクトを作る
-                // 创建轮廓对象
-                MatOfPoint[] contours;
-                // 輪郭検出
-                // 轮廓检测
-                contours = procImg.FindContoursAsMat(RetrievalModes.External, ContourApproximationModes.ApproxTC89L1);
-                // 輪郭存在する場合
-                // 如果存在轮廓
-                if (0 < contours.GetLength(0))
-                {
-                    // 輪郭により外接円の円心と半径を求める
-                    // 求外接圆圆心及半径
-                    contours[0].MinEnclosingCircle(out Point2f center, out float radius);
-                    // 元画像に外接円を描画
-                    // 在原图像上绘制外接圆
-                    srcImg.Circle((Point)center, (int)radius, Scalar.Green);
-                }
-
-                // 元画像を表示
-                // 显示原图像
-                pictureBox2.Image = srcImg.ToBitmap();
+                ImageProcessing(srcImg);
             }
             else
             {
