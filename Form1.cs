@@ -14,12 +14,9 @@ namespace PBL2019_Robotics
 {
     public partial class Form1 : Form
     {
-        // カメラを取得するオブジェクトを作る
-        // 创建视频捕获对象
         private VideoCapture capture;
-        // ロボットを動くオブジェクトを作る
-        // 创建小车动作对象
         BeautoRoverlib br = new BeautoRoverlib();
+        static int count = 0;
         public Form1()
         {
             // コンポーネント初期化
@@ -27,7 +24,7 @@ namespace PBL2019_Robotics
             InitializeComponent();
             // カメラ映像を取得
             // 获取摄像头影像
-            capture = VideoCapture.FromCamera(0);
+            capture = VideoCapture.FromCamera(1);
             // カメラデバイスが正常にオープンしたか確認
             // 确认是否正常获取摄像头
             //textBox1.Text = Convert.ToString(capture.IsOpened());
@@ -43,12 +40,13 @@ namespace PBL2019_Robotics
             // 画面の幅を設定する
             // 设定画面宽度
             capture.Set(CaptureProperty.FrameWidth, 320);
+            textBox3.Text = Convert.ToString(capture.Fps);
             // タイマー処理開始
             // timer开始
             timer1.Start();
             // シリアルポートを開く
             // 打开串口
-            //textBox1.Text = br.OpenCOMPort("COM4");
+            textBox1.Text = br.OpenCOMPort("COM4");
             // スタートバートン無効化
             // Start按钮无效化
             buttonStart.Enabled = false;
@@ -66,7 +64,7 @@ namespace PBL2019_Robotics
             timer1.Stop();
             // シリアルポートを閉じる
             // 关闭串口
-            //textBox1.Text = br.Close();
+            textBox1.Text = br.Close();
             // スタートバートン有効化
             // Start按钮有效化
             buttonStart.Enabled = true;
@@ -97,7 +95,30 @@ namespace PBL2019_Robotics
                     GC.Collect();
                 }
 
-                ImageProcessing(srcImg);
+                Point2f nowCtr, befCtr = new Point2f(-1, -1);
+                float nowRad, befRad = 0;
+
+                ImageProcessing(srcImg, out nowCtr, out nowRad);
+
+                if (nowCtr != null && befCtr != null)
+                {
+                    //textBox2.Text = Convert.ToString((int)nowCtr.X) + "," + Convert.ToString((int)nowCtr.Y);
+                    //textBox3.Text = Convert.ToString(nowRad);
+
+                    if (count == 10)
+                    {
+                        count = 0;
+                        befCtr = nowCtr;
+                        befRad = nowRad;
+                        //RobotControl(nowCtr, nowRad, befCtr, befRad);
+                    }
+
+                    count++;
+                }
+                else
+                {
+                    textBox1.Text = "error";
+                }
             }
             else
             {
